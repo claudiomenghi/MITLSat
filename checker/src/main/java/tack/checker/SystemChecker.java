@@ -178,7 +178,7 @@ public class SystemChecker {
 		this.checkingtime = cltlocSolver.getCheckingtime();
 
 		
-		return sat ? false : true;
+		return sat;
 	}
 
 	
