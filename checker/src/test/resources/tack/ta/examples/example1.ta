@@ -1,0 +1,23 @@
+
+process SenderA {
+
+int Astop{0,1,2}=0;
+
+clock c;
+clock Ac;
+
+chan Acheck;
+
+  state  call_check, ex_jam;
+  init   call_check;
+  trans  call_check -> ex_jam {
+           guard  Astop  ==0;
+           assign Ac := 0;
+         },
+  		ex_jam -> ex_jam {  assign Ac := 0; };      
+}
+
+
+ 
+system Sender_A;
+
