@@ -39,7 +39,7 @@ public class SystemChecker {
 	 */
 	protected final PrintStream out;
 
-	protected CLTLocFormula taFormula;
+
 
 	protected CLTLocFormula formula;
 
@@ -163,7 +163,7 @@ public class SystemChecker {
 
 		out.println("Creating the CLTLoc formulae of the model and the property");
 		CLTLocFormula conjunctionFormula = new CLTLocYesterday(
-				CLTLocFormula.getAnd(taFormula, formula, additionalConstraints));
+				CLTLocFormula.getAnd(formula, additionalConstraints));
 		out.println("Conjunction of the formulae created");
 
 		out.println("Running ZOT... This might take a while");
@@ -183,9 +183,7 @@ public class SystemChecker {
 
 	
 
-	public CLTLocFormula getTAEncoding() {
-		return taFormula;
-	}
+	
 
 	
 
