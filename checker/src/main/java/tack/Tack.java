@@ -35,8 +35,9 @@ public class Tack {
 				"------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		Preconditions.checkArgument(args.length >= 2,
-				"you must specify the file that contains the MITLI formula and the bound to be used");
+				"you must specify the MITLI formula and the bound");
 
+		
 		String propertyFile = args[0];
 		String bound = args[1];
 
