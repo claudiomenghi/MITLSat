@@ -46,8 +46,6 @@ import zotrunner.ZotException;
 
 public class SystemChecker {
 
-	
-	
 	public static final Function<Integer, CLTLocFormula> rest = (s) -> new CLTLocAP("H_" + s);
 
 	public static final Function<Integer, CLTLocFormula> first = (s) -> new CLTLocAP("P_" + s);
@@ -111,8 +109,6 @@ public class SystemChecker {
 
 	public static final Function<AP, CLTLocFormula> ap2CLTLocFIRSTAp = ap -> new CLTLocAP("P_" + ap.getName());
 
-	
-
 	public static final BinaryOperator<CLTLocFormula> xorOperator = (left, right) -> {
 		Preconditions.checkNotNull(left, "The left formula cannot be null");
 		Preconditions.checkNotNull(right, "The right formula cannot be null");
@@ -144,10 +140,7 @@ public class SystemChecker {
 	 */
 	protected final PrintStream out;
 
-
-
 	protected CLTLocFormula formula;
-
 
 	private float checkingtime;
 
@@ -161,28 +154,20 @@ public class SystemChecker {
 
 	private long sattime = 0;
 
-
 	public long getCltloc2zotTime() {
 		return cltloc2zotTime;
 	}
 
 	/**
 	 * 
-	 * @param ta
-	 *            the timed automaton to be verified
-	 * @param mitliformula
-	 *            the MITLI to be considered
-	 * @param bound
-	 *            the bound to be used
-	 * @throws NullPointerException
-	 *             if the timed automaton is null
-	 * @throws NullPointerException
-	 *             if the MITLI formula is null
-	 * @throws IllegalArgumentException
-	 *             if the bound is not grater than zero
+	 * @param ta           the timed automaton to be verified
+	 * @param mitliformula the MITLI to be considered
+	 * @param bound        the bound to be used
+	 * @throws NullPointerException     if the timed automaton is null
+	 * @throws NullPointerException     if the MITLI formula is null
+	 * @throws IllegalArgumentException if the bound is not grater than zero
 	 */
-	public SystemChecker(MITLIFormula mitliformula, int bound,
-			PrintStream out) {
+	public SystemChecker(MITLIFormula mitliformula, int bound, PrintStream out) {
 		Preconditions.checkNotNull(mitliformula, "The formula of interest cannot be null");
 		Preconditions.checkArgument(bound > 0, "The bound should be grater than of zero");
 
@@ -231,13 +216,10 @@ public class SystemChecker {
 
 		BiMap<MITLIFormula, Integer> vocabular = translator.getVocabulary().inverse();
 		Set<MITLIRelationalAtom> atoms = mitliformula.accept(new GetRelationalAtomsVisitor());
-		
-		Set<VariableAssignementAP> atomicpropositionsVariable = atoms
-				.stream().map(
-						a -> new VariableAssignementAP(
-								vocabular.get(a),
-								new Variable(a.getIdentifier()),
-								new Value(Float.toString(a.getValue()))))
+
+		Set<VariableAssignementAP> atomicpropositionsVariable = atoms.stream()
+				.map(a -> new VariableAssignementAP(vocabular.get(a), new Variable(a.getIdentifier()),
+						new Value(Float.toString(a.getValue()))))
 				.collect(Collectors.toSet());
 
 		StringBuilder vocabularyBuilder = new StringBuilder();
@@ -246,14 +228,13 @@ public class SystemChecker {
 		File binding = new File("binding.txt");
 		FileUtils.writeStringToFile(binding, vocabularyBuilder.toString());
 
-		
 		this.ta2clclocTime = timer.elapsed(TimeUnit.MILLISECONDS);
 
 		out.println("************************************************");
 
 		// out.println(converter.getMapStateId());
 		StringBuilder stateIdMappingBuilder = new StringBuilder();
-		
+
 		File stateIdStringMappingfile = new File("elementsIDmap.txt");
 
 		FileUtils.writeStringToFile(stateIdStringMappingfile, stateIdMappingBuilder.toString());
@@ -262,13 +243,13 @@ public class SystemChecker {
 		FileUtils.writeStringToFile(stateIdStringMappingfile, transitionsIdMappingBuilder.toString(), true);
 
 		out.println("Creating the CLTLoc formulae of the model and the property");
-		CLTLocFormula conjunctionFormula = new CLTLocYesterday(
-				CLTLocFormula.getAnd(formula, additionalConstraints, variablesAreTrueOnlyIfAssignmentsAreSatisfied(atoms,vocabular),
-						variableIntervalsAreRightClosed(atomicpropositionsVariable)));
+		CLTLocFormula conjunctionFormula = new CLTLocYesterday(CLTLocFormula.getAnd(formula, additionalConstraints,
+				variablesAreTrueOnlyIfAssignmentsAreSatisfied(atoms, vocabular),
+				variableIntervalsAreRightClosed(atomicpropositionsVariable)));
 		out.println("Conjunction of the formulae created");
 
 		out.println("Running ZOT... This might take a while");
-		
+
 		CLTLocsolver cltlocSolver = new CLTLocsolver(conjunctionFormula,
 				new PrintStream(ByteStreams.nullOutputStream()), bound);
 		boolean sat = cltlocSolver.solve();
@@ -278,55 +259,45 @@ public class SystemChecker {
 		this.cltloc2zotTime = cltlocSolver.getCltloc2zottime();
 		this.checkingtime = cltlocSolver.getCheckingtime();
 
-		
 		return sat;
 	}
-
-	
-
-	
 
 	protected CLTLocFormula variablesAreTrueOnlyIfAssignmentsAreSatisfied(
 			Set<MITLIRelationalAtom> atomicpropositionsVariable, BiMap<MITLIFormula, Integer> vocabular) {
 
-		return (CLTLocFormula) atomicpropositionsVariable.stream().map(ap -> 
+		return (CLTLocFormula) atomicpropositionsVariable.stream().map(ap ->
 
 		{
-				formulae.cltloc.atoms.Variable variable =
-						new formulae.cltloc.atoms.Variable(
-										ap.getIdentifier());
-				
-				CLTLocFormula f=null;
-				System.out.println(ap.getOperator());
-				if(Relation.parse(ap.getOperator()).equals(Relation.EQ)) {
-					f=new CLTLocEQRelation(
-							variable, new Constant(ap.getValue()));
-				}
-				if(Relation.parse(ap.getOperator()).equals(Relation.LEQ)) {
-					f=new CLTLocLEQRelation(
-							variable, new Constant(ap.getValue()));
-				}
+			formulae.cltloc.atoms.Variable variable = new formulae.cltloc.atoms.Variable(ap.getIdentifier());
 
-				if(Relation.parse(ap.getOperator()).equals(Relation.LE)) {
-					f=new CLTLocLERelation(
-							variable, new Constant(ap.getValue()));
+			CLTLocFormula f = null;
+			if (Relation.parse(ap.getOperator()).equals(Relation.EQ)) {
+				f = new CLTLocEQRelation(variable, new Constant(ap.getValue()));
+			} else {
+				if (Relation.parse(ap.getOperator()).equals(Relation.LEQ)) {
+					f = new CLTLocLEQRelation(variable, new Constant(ap.getValue()));
+				} else {
+
+					if (Relation.parse(ap.getOperator()).equals(Relation.LE)) {
+						f = new CLTLocLERelation(variable, new Constant(ap.getValue()));
+					} else {
+
+						if (Relation.parse(ap.getOperator()).equals(Relation.LEQ)) {
+							f = new CLTLocGEQRelation(variable, new Constant(ap.getValue()));
+						} else {
+
+							if (Relation.parse(ap.getOperator()).equals(Relation.GE)) {
+								f = new CLTLocGERelation(variable, new Constant(ap.getValue()));
+							}
+							else {
+								throw new IllegalArgumentException("Operator: "+ap.getOperator()+" Not valid");
+							}
+						}
+					}
 				}
+			}
 
-				if(Relation.parse(ap.getOperator()).equals(Relation.LEQ)) {
-					f=new CLTLocGEQRelation(
-							variable, new Constant(ap.getValue()));
-				}
-
-				if(Relation.parse(ap.getOperator()).equals(Relation.GE)) {
-					f=new CLTLocGERelation(
-							variable, new Constant(ap.getValue()));
-				}
-
-				return (CLTLocFormula) iffOperator.apply(rest.apply(vocabular.get(ap)),
-						 f);
-			
-
-			
+			return (CLTLocFormula) iffOperator.apply(rest.apply(vocabular.get(ap)), f);
 
 		}).reduce(CLTLocFormula.TRUE, conjunctionOperator);
 
@@ -338,7 +309,6 @@ public class SystemChecker {
 						nextOperator.apply(first.apply(ap.getEncodingSymbol()))))
 				.reduce(CLTLocFormula.TRUE, conjunctionOperator);
 	}
-	
 
 	public CLTLocFormula getFormulaEncoding() {
 		return formula;
