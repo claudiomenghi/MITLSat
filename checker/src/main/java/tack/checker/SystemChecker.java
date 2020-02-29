@@ -28,6 +28,11 @@ import formulae.cltloc.operators.unary.CLTLocNegation;
 import formulae.cltloc.operators.unary.CLTLocNext;
 import formulae.cltloc.operators.unary.CLTLocYesterday;
 import formulae.cltloc.relations.CLTLocEQRelation;
+import formulae.cltloc.relations.CLTLocGEQRelation;
+import formulae.cltloc.relations.CLTLocGERelation;
+import formulae.cltloc.relations.CLTLocLEQRelation;
+import formulae.cltloc.relations.CLTLocLERelation;
+import formulae.cltloc.relations.Relation;
 import formulae.mitli.MITLIFormula;
 import formulae.mitli.atoms.MITLIRelationalAtom;
 import formulae.mitli.converters.MITLI2CLTLoc;
@@ -213,9 +218,8 @@ public class SystemChecker {
 		timer.start();
 		out.println("************************************************");
 		// out.println("MITLI formula: " + mitliformula);
-		MITLIFormula negatedFormula = MITLIFormula.not(mitliformula);
 		out.println("Converting the MITLI formula in CLTLoc");
-		MITLI2CLTLoc translator = new MITLI2CLTLoc(negatedFormula);
+		MITLI2CLTLoc translator = new MITLI2CLTLoc(mitliformula);
 		formula = translator.apply();
 		out.println("MITLI formula converted in CLTLoc");
 		// out.println("************************************************");
@@ -231,12 +235,8 @@ public class SystemChecker {
 		Set<VariableAssignementAP> atomicpropositionsVariable = atoms
 				.stream().map(
 						a -> new VariableAssignementAP(
-								(a.getIdentifier().contains("_") ? a
-										.getIdentifier().substring(0, a.getIdentifier().indexOf("_")) : ""),
 								vocabular.get(a),
-								new Variable(a.getIdentifier().contains("_") ? a.getIdentifier()
-										.substring(a.getIdentifier().indexOf("_") + 1, a.getIdentifier().length())
-										: a.getIdentifier()),
+								new Variable(a.getIdentifier()),
 								new Value(Float.toString(a.getValue()))))
 				.collect(Collectors.toSet());
 
@@ -263,7 +263,7 @@ public class SystemChecker {
 
 		out.println("Creating the CLTLoc formulae of the model and the property");
 		CLTLocFormula conjunctionFormula = new CLTLocYesterday(
-				CLTLocFormula.getAnd(formula, additionalConstraints, variablesAreTrueOnlyIfAssignmentsAreSatisfied(atomicpropositionsVariable),
+				CLTLocFormula.getAnd(formula, additionalConstraints, variablesAreTrueOnlyIfAssignmentsAreSatisfied(atoms,vocabular),
 						variableIntervalsAreRightClosed(atomicpropositionsVariable)));
 		out.println("Conjunction of the formulae created");
 
@@ -287,19 +287,37 @@ public class SystemChecker {
 	
 
 	protected CLTLocFormula variablesAreTrueOnlyIfAssignmentsAreSatisfied(
-			Set<VariableAssignementAP> atomicpropositionsVariable) {
+			Set<MITLIRelationalAtom> atomicpropositionsVariable, BiMap<MITLIFormula, Integer> vocabular) {
 
-		return (CLTLocFormula) atomicpropositionsVariable.stream().map(ap ->
+		return (CLTLocFormula) atomicpropositionsVariable.stream().map(ap -> 
 
 		{
 				formulae.cltloc.atoms.Variable variable =
 						new formulae.cltloc.atoms.Variable(
-										(ap.getAutomaton() != "" ? ap.getAutomaton() + "_" : "")
-												+ ap.getVariable().getName());
-				return (CLTLocFormula) iffOperator.apply(rest.apply(ap.getEncodingSymbol()),
-						(CLTLocFormula) new CLTLocEQRelation(
+										ap.getIdentifier());
+				
+				CLTLocFormula f=null;
+				if(ap.getOperator()==Relation.EQ.toString())
+					f=new CLTLocEQRelation(
+							variable, new Constant(ap.getValue()));
+				if(ap.getOperator()==Relation.LEQ.toString())
+					f=new CLTLocLEQRelation(
+							variable, new Constant(ap.getValue()));
 
-								variable, new Constant(ap.getValue().value)));
+				if(ap.getOperator()==Relation.LE.toString())
+					f=new CLTLocLERelation(
+							variable, new Constant(ap.getValue()));
+
+				if(ap.getOperator()==Relation.GEQ.toString())
+					f=new CLTLocGEQRelation(
+							variable, new Constant(ap.getValue()));
+
+				if(ap.getOperator()==Relation.GE.toString())
+					f=new CLTLocGERelation(
+							variable, new Constant(ap.getValue()));
+
+				return (CLTLocFormula) iffOperator.apply(rest.apply(vocabular.get(ap)),
+						 f);
 			
 
 			
