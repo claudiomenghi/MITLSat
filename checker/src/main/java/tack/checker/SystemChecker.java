@@ -135,18 +135,7 @@ public class SystemChecker {
 		File binding = new File("binding.txt");
 		FileUtils.writeStringToFile(binding, vocabularyBuilder.toString());
 
-		out.println("************************************************");
-		out.println("************************************************");
-		out.println("Converting the TA in CLTLoc");
-
-		timer.reset();
-		timer.start();
-
 		
-		
-		out.println("TA converted in CLTLoc");
-
-		timer.stop();
 		this.ta2clclocTime = timer.elapsed(TimeUnit.MILLISECONDS);
 
 		out.println("************************************************");

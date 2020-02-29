@@ -56,11 +56,6 @@ public class Tack {
 		out.println("Property loaded" + propertyFile);
 
 		// loading the model
-		out.println("Loading the model");
-
-		
-		out.println("Model loaded");
-
 		File f = new File("config.txt");
 		ZotPlugin zotPlugin = null;
 
@@ -74,7 +69,6 @@ public class Tack {
 		out.println();
 		out.println(
 				"------------------------------------------------------------------------------------------------------------------------------------------------------------");
-
 		out.println("The property of interest is : " + ((result) ? "satisfiable" : "not satisfiable"));
 		out.println(((result) ? "" : "check the file counterexample.txt to see the violating trace"));
 		out.println(((result) ? ""
