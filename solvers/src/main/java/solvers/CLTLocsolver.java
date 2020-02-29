@@ -62,7 +62,7 @@ public class CLTLocsolver {
 			zotPlugin = ZotPlugin.AE2ZOT;
 		}
 
-		String zotEncoding = new CLTLoc2zot(bound, formula.accept(new CLTLocGetMaxBound()), zotPlugin).apply(formula);
+		String zotEncoding = new CLTLoc2zot((int) bound,Math.round(formula.accept(new CLTLocGetMaxBound())), zotPlugin).apply(formula);
 		timer.stop();
 		cltloc2zottime = timer.elapsed(TimeUnit.MILLISECONDS);
 
