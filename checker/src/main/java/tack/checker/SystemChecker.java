@@ -297,6 +297,7 @@ public class SystemChecker {
 										ap.getIdentifier());
 				
 				CLTLocFormula f=null;
+				System.out.println(ap.getOperator());
 				if(ap.getOperator()==Relation.EQ.toString())
 					f=new CLTLocEQRelation(
 							variable, new Constant(ap.getValue()));
