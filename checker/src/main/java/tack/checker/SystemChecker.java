@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
@@ -14,15 +18,111 @@ import com.google.common.collect.BiMap;
 import com.google.common.io.ByteStreams;
 
 import formulae.cltloc.CLTLocFormula;
+import formulae.cltloc.atoms.CLTLocAP;
+import formulae.cltloc.atoms.Constant;
+import formulae.cltloc.operators.binary.CLTLocIff;
+import formulae.cltloc.operators.binary.CLTLocImplies;
+import formulae.cltloc.operators.unary.CLTLocEventually;
+import formulae.cltloc.operators.unary.CLTLocGlobally;
+import formulae.cltloc.operators.unary.CLTLocNegation;
+import formulae.cltloc.operators.unary.CLTLocNext;
 import formulae.cltloc.operators.unary.CLTLocYesterday;
+import formulae.cltloc.relations.CLTLocEQRelation;
 import formulae.mitli.MITLIFormula;
 import formulae.mitli.atoms.MITLIRelationalAtom;
 import formulae.mitli.converters.MITLI2CLTLoc;
 import formulae.mitli.visitors.GetRelationalAtomsVisitor;
 import solvers.CLTLocsolver;
+import tack.AP;
+import tack.Value;
+import tack.Variable;
+import tack.VariableAssignementAP;
 import zotrunner.ZotException;
 
 public class SystemChecker {
+
+	
+	
+	public static final Function<Integer, CLTLocFormula> rest = (s) -> new CLTLocAP("H_" + s);
+
+	public static final Function<Integer, CLTLocFormula> first = (s) -> new CLTLocAP("P_" + s);
+
+	public static final BinaryOperator<CLTLocFormula> conjunctionOperator = (left, right) -> {
+		Preconditions.checkNotNull(left, "The left formula cannot be null");
+		Preconditions.checkNotNull(right, "The right formula cannot be null");
+
+		return CLTLocFormula.getAnd(left, right);
+	};
+
+	public static final BinaryOperator<CLTLocFormula> iffOperator = (left, right) -> {
+		Preconditions.checkNotNull(left, "The left formula cannot be null");
+		Preconditions.checkNotNull(right, "The right formula cannot be null");
+
+		if (left.equals(CLTLocFormula.TRUE)) {
+			return right;
+		}
+		if (right.equals(CLTLocFormula.TRUE)) {
+			return left;
+		}
+		return new CLTLocIff(left, right);
+	};
+
+	public static final BinaryOperator<CLTLocFormula> disjunctionOperator = (left, right) -> {
+		Preconditions.checkNotNull(left, "The left formula cannot be null");
+		Preconditions.checkNotNull(right, "The right formula cannot be null");
+
+		return CLTLocFormula.getOr(left, right);
+	};
+
+	public static final UnaryOperator<CLTLocFormula> eventuallyOperator = (formula) -> {
+
+		return new CLTLocEventually(formula);
+	};
+
+	public static final BinaryOperator<CLTLocFormula> implicationOperator = (left, right) -> {
+		Preconditions.checkNotNull(left, "The left formula cannot be null");
+		Preconditions.checkNotNull(right, "The right formula cannot be null");
+		return CLTLocImplies.create(left, right);
+	};
+
+	public static final UnaryOperator<CLTLocFormula> negationOperator = CLTLocNegation::new;
+	public static final UnaryOperator<CLTLocFormula> globallyOperator = (formula) -> {
+		if (formula.equals(CLTLocFormula.TRUE)) {
+			return formula;
+		}
+		return CLTLocGlobally.create(formula);
+	};
+
+	public static final UnaryOperator<CLTLocFormula> nextOperator = (formula) -> {
+		Preconditions.checkNotNull(formula, "The formula cannot be null");
+
+		if (formula.equals(CLTLocFormula.TRUE)) {
+			return formula;
+		}
+		return new CLTLocNext(formula);
+	};
+
+	public static final UnaryOperator<CLTLocFormula> Y = CLTLocYesterday::new;
+
+	public static final Function<AP, CLTLocFormula> ap2CLTLocFIRSTAp = ap -> new CLTLocAP("P_" + ap.getName());
+
+	
+
+	public static final BinaryOperator<CLTLocFormula> xorOperator = (left, right) -> {
+		Preconditions.checkNotNull(left, "The left formula cannot be null");
+		Preconditions.checkNotNull(right, "The right formula cannot be null");
+
+		if (left.equals(CLTLocFormula.FALSE)) {
+			return right;
+		}
+
+		if (right.equals(CLTLocFormula.FALSE)) {
+			return left;
+		}
+
+		return CLTLocFormula.getOr(CLTLocFormula.getAnd(left, negationOperator.apply(right)),
+				CLTLocFormula.getAnd(negationOperator.apply(left), right));
+	};
 
 	/**
 	 * The MITLI formula to be considered
@@ -128,6 +228,17 @@ public class SystemChecker {
 		BiMap<MITLIFormula, Integer> vocabular = translator.getVocabulary().inverse();
 		Set<MITLIRelationalAtom> atoms = mitliformula.accept(new GetRelationalAtomsVisitor());
 		
+		Set<VariableAssignementAP> atomicpropositionsVariable = atoms
+				.stream().map(
+						a -> new VariableAssignementAP(
+								(a.getIdentifier().contains("_") ? a
+										.getIdentifier().substring(0, a.getIdentifier().indexOf("_")) : ""),
+								vocabular.get(a),
+								new Variable(a.getIdentifier().contains("_") ? a.getIdentifier()
+										.substring(a.getIdentifier().indexOf("_") + 1, a.getIdentifier().length())
+										: a.getIdentifier()),
+								new Value(Float.toString(a.getValue()))))
+				.collect(Collectors.toSet());
 
 		StringBuilder vocabularyBuilder = new StringBuilder();
 		vocabular.entrySet().forEach(e -> vocabularyBuilder.append(e.getValue() + "\t" + e.getKey() + "\n"));
@@ -152,7 +263,8 @@ public class SystemChecker {
 
 		out.println("Creating the CLTLoc formulae of the model and the property");
 		CLTLocFormula conjunctionFormula = new CLTLocYesterday(
-				CLTLocFormula.getAnd(formula, additionalConstraints));
+				CLTLocFormula.getAnd(formula, additionalConstraints, variablesAreTrueOnlyIfAssignmentsAreSatisfied(atomicpropositionsVariable),
+						variableIntervalsAreRightClosed(atomicpropositionsVariable)));
 		out.println("Conjunction of the formulae created");
 
 		out.println("Running ZOT... This might take a while");
@@ -174,6 +286,34 @@ public class SystemChecker {
 
 	
 
+	protected CLTLocFormula variablesAreTrueOnlyIfAssignmentsAreSatisfied(
+			Set<VariableAssignementAP> atomicpropositionsVariable) {
+
+		return (CLTLocFormula) atomicpropositionsVariable.stream().map(ap ->
+
+		{
+				formulae.cltloc.atoms.Variable variable =
+						new formulae.cltloc.atoms.Variable(
+										(ap.getAutomaton() != "" ? ap.getAutomaton() + "_" : "")
+												+ ap.getVariable().getName());
+				return (CLTLocFormula) iffOperator.apply(rest.apply(ap.getEncodingSymbol()),
+						(CLTLocFormula) new CLTLocEQRelation(
+
+								variable, new Constant(ap.getValue().value)));
+			
+
+			
+
+		}).reduce(CLTLocFormula.TRUE, conjunctionOperator);
+
+	}
+
+	protected CLTLocFormula variableIntervalsAreRightClosed(Set<VariableAssignementAP> atomicpropositionsVariable) {
+		return (CLTLocFormula) atomicpropositionsVariable.stream()
+				.map(ap -> iffOperator.apply(rest.apply(ap.getEncodingSymbol()),
+						nextOperator.apply(first.apply(ap.getEncodingSymbol()))))
+				.reduce(CLTLocFormula.TRUE, conjunctionOperator);
+	}
 	
 
 	public CLTLocFormula getFormulaEncoding() {
