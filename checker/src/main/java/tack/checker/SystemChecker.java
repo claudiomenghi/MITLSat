@@ -298,24 +298,30 @@ public class SystemChecker {
 				
 				CLTLocFormula f=null;
 				System.out.println(ap.getOperator());
-				if(ap.getOperator()==Relation.EQ.toString())
+				if(ap.getOperator()=="=") {
 					f=new CLTLocEQRelation(
 							variable, new Constant(ap.getValue()));
-				if(ap.getOperator()==Relation.LEQ.toString())
+				}
+				if(ap.getOperator()=="<=") {
 					f=new CLTLocLEQRelation(
 							variable, new Constant(ap.getValue()));
+				}
 
-				if(ap.getOperator()==Relation.LE.toString())
+				if(ap.getOperator()=="<") {
+					System.out.println("Less operator");
 					f=new CLTLocLERelation(
 							variable, new Constant(ap.getValue()));
+				}
 
-				if(ap.getOperator()==Relation.GEQ.toString())
+				if(ap.getOperator()==">=") {
 					f=new CLTLocGEQRelation(
 							variable, new Constant(ap.getValue()));
+				}
 
-				if(ap.getOperator()==Relation.GE.toString())
+				if(ap.getOperator()==">") {
 					f=new CLTLocGERelation(
 							variable, new Constant(ap.getValue()));
+				}
 
 				return (CLTLocFormula) iffOperator.apply(rest.apply(vocabular.get(ap)),
 						 f);
