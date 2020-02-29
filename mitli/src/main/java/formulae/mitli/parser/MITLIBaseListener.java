@@ -1,4 +1,4 @@
-// Generated from MITLI.g4 by ANTLR 4.6
+// Generated from MITLI.g4 by ANTLR 4.4
 
 package formulae.mitli.parser;
 
@@ -14,6 +14,7 @@ import formulae.mitli.atoms.*;
 
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -28,84 +29,84 @@ public class MITLIBaseListener implements MITLIListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMitli(MITLIParser.MitliContext ctx) { }
+	@Override public void enterMitli(@NotNull MITLIParser.MitliContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMitli(MITLIParser.MitliContext ctx) { }
+	@Override public void exitMitli(@NotNull MITLIParser.MitliContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogic(MITLIParser.LogicContext ctx) { }
+	@Override public void enterConjuncts_list(@NotNull MITLIParser.Conjuncts_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogic(MITLIParser.LogicContext ctx) { }
+	@Override public void exitConjuncts_list(@NotNull MITLIParser.Conjuncts_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDeclaration(MITLIParser.DeclarationContext ctx) { }
+	@Override public void enterLogic(@NotNull MITLIParser.LogicContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDeclaration(MITLIParser.DeclarationContext ctx) { }
+	@Override public void exitLogic(@NotNull MITLIParser.LogicContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFmla(MITLIParser.FmlaContext ctx) { }
+	@Override public void enterFmla(@NotNull MITLIParser.FmlaContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFmla(MITLIParser.FmlaContext ctx) { }
+	@Override public void exitFmla(@NotNull MITLIParser.FmlaContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterConjuncts_list(MITLIParser.Conjuncts_listContext ctx) { }
+	@Override public void enterDeclaration(@NotNull MITLIParser.DeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitConjuncts_list(MITLIParser.Conjuncts_listContext ctx) { }
+	@Override public void exitDeclaration(@NotNull MITLIParser.DeclarationContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEveryRule(ParserRuleContext ctx) { }
+	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEveryRule(ParserRuleContext ctx) { }
+	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void visitTerminal(TerminalNode node) { }
+	@Override public void visitTerminal(@NotNull TerminalNode node) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void visitErrorNode(ErrorNode node) { }
+	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }

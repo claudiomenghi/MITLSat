@@ -9,11 +9,11 @@ public class Constant extends Atom implements Expression {
 	private final String value;
 	private final int hash;
 
-	private final static HashMap<Integer, Constant> map=new HashMap<>();
+	private final static HashMap<Float, Constant> map=new HashMap<>();
 	
-	public Constant(int value) {
+	public Constant(float value) {
 		super();
-		this.value = Integer.toString(value);
+		this.value = Float.toString(value);
 
 		final int prime = 31;
 		int result = 1;
@@ -21,7 +21,7 @@ public class Constant extends Atom implements Expression {
 		hash = result;
 	}
 	
-	public static Constant getConstant(int value){
+	public static Constant getConstant(float value){
 		if(map.containsKey(value)){
 			return map.get(value);
 		}

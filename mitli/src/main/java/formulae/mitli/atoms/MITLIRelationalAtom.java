@@ -14,19 +14,22 @@ public class MITLIRelationalAtom extends MITLIAtom {
 
 	private final String identifier;
 	private final String operator;
-	private final int value;
+	private float floatvalue;
+	
 	private final int hash;
 
-	public MITLIRelationalAtom(String identifier, String operator, int value) {
+	
+
+	public MITLIRelationalAtom(String identifier, String operator, float value) {
 		Preconditions.checkNotNull(identifier, "The identifier cannot be nulll");
 		Preconditions.checkNotNull(operator, "The operator cannot be nulll");
 		Preconditions.checkArgument(value >= 0, "The value must be grather than or equal to zero");
 		this.identifier = identifier;
 		this.operator = operator;
-		this.value = value;
+		this.floatvalue = value;
 		this.hash = this.privateHashCode();
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -43,8 +46,8 @@ public class MITLIRelationalAtom extends MITLIAtom {
 		return identifier;
 	}
 
-	public int getValue() {
-		return value;
+	public float getValue() {
+		return floatvalue;
 	}
 	
 	private int privateHashCode() {
@@ -52,7 +55,7 @@ public class MITLIRelationalAtom extends MITLIAtom {
 		int result = 1;
 		result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
 		result = prime * result + ((operator == null) ? 0 : operator.hashCode());
-		result = prime * result + value;
+		result = prime * result + (int) floatvalue;
 		return result;
 	}
 
@@ -78,7 +81,7 @@ public class MITLIRelationalAtom extends MITLIAtom {
 				return false;
 		} else if (!operator.equals(other.operator))
 			return false;
-		if (value != other.value)
+		if (floatvalue != other.floatvalue)
 			return false;
 		return true;
 	}
@@ -93,7 +96,7 @@ public class MITLIRelationalAtom extends MITLIAtom {
 
 	@Override
 	public String toString() {
-		return "("+identifier+" "+operator+" "+ value+")";
+		return "("+identifier+" "+operator+" "+ floatvalue+")";
 	}
 	
 	/**

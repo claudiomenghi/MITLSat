@@ -63,6 +63,12 @@ fmla returns [MITLIFormula r]
 				
 				$r = f;
 		}
+	|   ID  OP REAL
+		{
+			MITLIFormula f = new MITLIRelationalAtom($ID.text, $OP.text, Float.parseFloat($REAL.text));
+				
+				$r = f;
+		}
 	|	 NEG_OP LPAR f1=fmla RPAR 
 		{	
 			MITLIFormula f = MITLIFormula.not((MITLIFormula) $f1.r);
@@ -298,6 +304,10 @@ COLON: ':';
 SEMI: ';';
 INT : ('0'..'9')+ ;
 fragment ATOM: 'a'..'z';
+
+REAL
+ : [0-9]* '.' [0-9]+
+ ;
 
 fragment ATOMInit: 'a'..'z' | 'A'..'Z';
 
