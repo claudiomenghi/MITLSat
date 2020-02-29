@@ -29,10 +29,10 @@ import formulae.cltloc.operators.unary.CLTLocNext;
 import formulae.cltloc.operators.unary.CLTLocYesterday;
 import formulae.cltloc.relations.CLTLocRelation;
 
-public class CLTLocGetMaxBound implements CLTLocVisitor<Integer>{
+public class CLTLocGetMaxBound implements CLTLocVisitor<Float>{
 
 	@Override
-	public Integer visit(CLTLocConjunction formula) {
+	public Float visit(CLTLocConjunction formula) {
 		
 		return Math.max(
 				formula.getLeftChild().accept(this),
@@ -40,138 +40,138 @@ public class CLTLocGetMaxBound implements CLTLocVisitor<Integer>{
 	}
 
 	@Override
-	public Integer visit(CLTLocNegation formula) {
+	public Float visit(CLTLocNegation formula) {
 		return formula.getChild().accept(this);
 	}
 
 	@Override
-	public Integer visit(CLTLocUntil formula) {
+	public Float visit(CLTLocUntil formula) {
 		return Math.max(
 				formula.getLeftChild().accept(this),
 				formula.getRightChild().accept(this));
 	}
 
 	@Override
-	public Integer visit(CLTLocImplies formula) {
+	public Float visit(CLTLocImplies formula) {
 		return Math.max(
 				formula.getLeftChild().accept(this),
 				formula.getRightChild().accept(this));
 	}
 
 	@Override
-	public Integer visit(CLTLocIff formula) {
+	public Float visit(CLTLocIff formula) {
 		return Math.max(
 				formula.getLeftChild().accept(this),
 				formula.getRightChild().accept(this));
 	}
 
 	@Override
-	public Integer visit(CLTLocNext formula) {
+	public Float visit(CLTLocNext formula) {
 		return formula.getChild().accept(this);
 	}
 
 	@Override
-	public Integer visit(CLTLocGlobally formula) {
+	public Float visit(CLTLocGlobally formula) {
 		return formula.getChild().accept(this);
 	}
 
 	@Override
-	public Integer visit(CLTLocEventually formula) {
+	public Float visit(CLTLocEventually formula) {
 		return formula.getChild().accept(this);
 	}
 
 	@Override
-	public Integer visit(CLTLocSince formula) {
+	public Float visit(CLTLocSince formula) {
 		return Math.max(
 				formula.getLeftChild().accept(this),
 				formula.getRightChild().accept(this));
 	}
 
 	@Override
-	public Integer visit(CLTLocYesterday formula) {
+	public Float visit(CLTLocYesterday formula) {
 		return formula.getChild().accept(this);
 	}
 
 	@Override
-	public Integer visit(CLTLocRelease formula) {
+	public Float visit(CLTLocRelease formula) {
 		return Math.max(
 				formula.getLeftChild().accept(this),
 				formula.getRightChild().accept(this));
 	}
 
 	@Override
-	public Integer visit(CLTLocRelation formula) {
+	public Float visit(CLTLocRelation formula) {
 		if(formula.getLeftChild() instanceof CLTLocClock && formula.getRightChild() instanceof Constant){
-			return Integer.parseInt(((Constant) formula.getRightChild()).getValue());
+			return Float.parseFloat(((Constant) formula.getRightChild()).getValue());
 		}
 		if(formula.getRightChild() instanceof CLTLocClock && formula.getLeftChild() instanceof Constant){
-			return Integer.parseInt(((Constant) formula.getLeftChild()).getValue());
+			return Float.parseFloat(((Constant) formula.getLeftChild()).getValue());
 		}
-		return 0;
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(CLTLocDisjunction formula) {
+	public Float visit(CLTLocDisjunction formula) {
 		return Math.max(
 				formula.getLeftChild().accept(this),
 				formula.getRightChild().accept(this));
 	}
 
 	@Override
-	public Integer visit(CLTLocAP formula) {
-		return 0;
+	public Float visit(CLTLocAP formula) {
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(CLTLocClock cltlClock) {
-		return 0;
+	public Float visit(CLTLocClock cltlClock) {
+		return 0.0f;
 
 	}
 
 	@Override
-	public Integer visit(Constant cltlConstantAtom) {
-		return 0;
+	public Float visit(Constant cltlConstantAtom) {
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(Signal formula) {
-return 0;
+	public Float visit(Signal formula) {
+return 0.0f;
 	}
 
 	@Override
-	public Integer visit(Variable cltLocVariable) {
-return 0;
+	public Float visit(Variable cltLocVariable) {
+return 0.0f;
 	}
 
 	@Override
-	public Integer visit(KeepVariableConstant keepVariableConstant) {
-		return 0;
+	public Float visit(KeepVariableConstant keepVariableConstant) {
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(CLTLocSelector formula) {
-		return 0;
+	public Float visit(CLTLocSelector formula) {
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(AssignNextVariable formula) {
-		return 0;
+	public Float visit(AssignNextVariable formula) {
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(BoundedVariable variable) {
-		return 0;
+	public Float visit(BoundedVariable variable) {
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(KeepBoundedVariableConstant variable) {
-		return 0;
+	public Float visit(KeepBoundedVariableConstant variable) {
+		return 0.0f;
 	}
 
 	@Override
-	public Integer visit(CLTLocNaryConjunction cltLocNaryConjunction) {
+	public Float visit(CLTLocNaryConjunction cltLocNaryConjunction) {
 		
-		int max=cltLocNaryConjunction.getChildren().iterator().next().accept(this);
+		Float max=cltLocNaryConjunction.getChildren().iterator().next().accept(this);
 		
 		for(CLTLocFormula f:cltLocNaryConjunction.getChildren() ){
 			max=Math.max(max, f.accept(this));
@@ -180,8 +180,8 @@ return 0;
 	}
 
 	@Override
-	public Integer visit(CLTLocNaryDisjunction cltLocNaryDisjunction) {
-		int max=cltLocNaryDisjunction.getChildren().iterator().next().accept(this);
+	public Float visit(CLTLocNaryDisjunction cltLocNaryDisjunction) {
+		Float max=cltLocNaryDisjunction.getChildren().iterator().next().accept(this);
 		
 		for(CLTLocFormula f:cltLocNaryDisjunction.getChildren() ){
 			max=Math.max(max, f.accept(this));
@@ -190,13 +190,13 @@ return 0;
 	}
 	
 	@Override
-	public Integer visit(CLTLocArithmeticExpression binaryArithmeticExpression) {
-		return 0;
+	public Float visit(CLTLocArithmeticExpression binaryArithmeticExpression) {
+		return 0.0f;
 	}
 	
 	@Override
-	public Integer visit(AssignVariable assignVariable) {
-		return 0;
+	public Float visit(AssignVariable assignVariable) {
+		return 0.0f;
 	}
 }
 
