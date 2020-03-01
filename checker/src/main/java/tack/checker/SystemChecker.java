@@ -282,7 +282,7 @@ public class SystemChecker {
 						f = new CLTLocLERelation(variable, new Constant(ap.getValue()));
 					} else {
 
-						if (Relation.parse(ap.getOperator()).equals(Relation.LEQ)) {
+						if (Relation.parse(ap.getOperator()).equals(Relation.GEQ)) {
 							f = new CLTLocGEQRelation(variable, new Constant(ap.getValue()));
 						} else {
 
